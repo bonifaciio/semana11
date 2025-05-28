@@ -1,46 +1,73 @@
-class TreeNode:
+class Node:
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
 
-def insert(root, val):
-    """Inserta un valor en el BST"""
-    if not root:
-        return TreeNode(val)
-    if val < root.val:
-        root.left = insert(root.left, val)
-    else:
-        root.right = insert(root.right, val)
-    return root
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
 
-def build_bst(values):
-    """Construye un BST a partir de una lista de valores"""
-    root = None
-    for val in values:
-        root = insert(root, val)
-    return root
+    def insert(self, val):
+        if not self.root:
+            self.root = Node(val)
+        else:
+            self._insert(self.root, val)
 
-def range_query(root, min_val, max_val):
-    """Encuentra todos los valores en el rango [min_val, max_val] usando recorrido inorder optimizado"""
-    result = []
-    
-    def inorder(node):
-        if not node:
-            return
-        if node.val > min_val:
-            inorder(node.left)
-        if min_val <= node.val <= max_val:
-            result.append(node.val)
-        if node.val < max_val:
-            inorder(node.right)
-    
-    inorder(root)
-    return result
+    def _insert(self, node, val):
+        if val < node.val:
+            if node.left:
+                self._insert(node.left, val)
+            else:
+                node.left = Node(val)
+        else:
+            if node.right:
+                self._insert(node.right, val)
+            else:
+                node.right = Node(val)
 
-# ✅ Test cases
-print(range_query(build_bst([7, 3, 11, 1, 5, 9, 13]), 5, 10) == [5, 7, 9])       # 🎯 Normal range
-print(range_query(build_bst([6, 4, 8, 2]), 1, 10) == [2, 4, 6, 8])              # 📊 Full coverage
-print(range_query(build_bst([20, 10, 30]), 1, 5) == [])                         # 📭 Empty result
-print(range_query(build_bst([15]), 10, 20) == [15])                             # 🌱 Single node
-print(range_query(build_bst([15, 10, 20, 5, 25]), 10, 20) == [10, 15, 20])     # 🔗 Include boundaries
+    def build_from_list(self, values):
+        for val in values:
+            self.insert(val)
+
+    def range_query(self, min_val, max_val):
+        """🎯 Find all values in BST within given range"""
+        result = []
+
+        def inorder(node):
+            if not node:
+                return
+            if node.val > min_val:
+                inorder(node.left)
+            if min_val <= node.val <= max_val:
+                result.append(node.val)
+            if node.val < max_val:
+                inorder(node.right)
+
+        inorder(self.root)
+        return result
+
+# 🧪 Test cases
+def test_range_query():
+    bst1 = BinarySearchTree()
+    bst1.build_from_list([7, 3, 11, 1, 5, 9, 13])
+    print("🧪 Test 1:", bst1.range_query(5, 10) == [5, 7, 9])  # ✅
+
+    bst2 = BinarySearchTree()
+    bst2.build_from_list([6, 4, 8, 2])
+    print("🧪 Test 2:", bst2.range_query(1, 10) == [2, 4, 6, 8])  # 🌐
+
+    bst3 = BinarySearchTree()
+    bst3.build_from_list([20, 10, 30])
+    print("🧪 Test 3:", bst3.range_query(1, 5) == [])  # 📭
+
+    bst4 = BinarySearchTree()
+    bst4.build_from_list([15])
+    print("🧪 Test 4:", bst4.range_query(10, 20) == [15])  # 🌱
+
+    bst5 = BinarySearchTree()
+    bst5.build_from_list([15, 10, 20, 5, 25])
+    print("🧪 Test 5:", bst5.range_query(10, 20) == [10, 15, 20])  # 🔗
+
+# 🚀 Run all tests
+test_range_query()
